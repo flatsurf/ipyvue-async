@@ -1,5 +1,5 @@
 {
   "load_extensions": {
-    "ipyvue-time-series/extension": true
+    "ipyvue-comm/extension": true
   }
 }

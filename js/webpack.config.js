@@ -25,7 +25,7 @@ module.exports = (env, argv) => {
             entry: './lib/extension.js',
             output: {
                 filename: 'extension.js',
-                path: path.resolve(__dirname, '..', 'ipyvue_time_series', 'nbextension'),
+                path: path.resolve(__dirname, '..', 'ipyvue_comm', 'nbextension'),
                 libraryTarget: 'amd',
                 publicPath: '' // publicPath is set in extension.js
             },
@@ -41,7 +41,7 @@ module.exports = (env, argv) => {
             entry: './lib/index.js',
             output: {
                 filename: 'index.js',
-                path: path.resolve(__dirname, '..', 'ipyvue_time_series', 'nbextension'),
+                path: path.resolve(__dirname, '..', 'ipyvue_comm', 'nbextension'),
                 libraryTarget: 'amd',
                 publicPath: '',
             },
@@ -51,7 +51,7 @@ module.exports = (env, argv) => {
             },
             externals: ['@jupyter-widgets/base', 'jupyter-vue'],
         },
-        {// Embeddable ipyvue-time-series bundle
+        {// Embeddable ipyvue-comm bundle
         //
         // This bundle is generally almost identical to the notebook bundle
         // containing the custom widget views and models.
@@ -70,7 +70,7 @@ module.exports = (env, argv) => {
                 filename: 'index.js',
                 path: path.resolve(__dirname, 'dist'),
                 libraryTarget: 'amd',
-                publicPath: 'https://unpkg.com/ipyvue-time-series@' + version + '/dist/'
+                publicPath: 'https://unpkg.com/ipyvue-comm@' + version + '/dist/'
             },
             devtool,
             module: {

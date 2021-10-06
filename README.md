@@ -1,32 +1,32 @@
-ipyvue-time-series
-==================
+ipyvue-comm
+===========
 
-Real-Time Plots in Jupyter Notebooks and JupyterLab
+Asynchronous communication channels between Vue components in Jupyter and Python.
 
 Installation
 ------------
 
 To install use pip:
 
-    pip install ipyvue_time_series
+    pip install ipyvue_comm
 
 Development
 -----------
 
 Install a local copy of this package:
 
-    git clone https://github.com/saraedum/ipyvue-time-series.git
-    cd ipyvue-time-series
+    git clone https://github.com/flatsurf/ipyvue-comm.git
+    cd ipyvue-comm
     pip install -e .
 
 When working with the classical notebook:
 
-    jupyter nbextension install --py --symlink --overwrite --sys-prefix ipyvue_time_series
-    jupyter nbextension enable --py --sys-prefix ipyvue_time_series
+    jupyter nbextension install --py --symlink --overwrite --sys-prefix ipyvue_comm
+    jupyter nbextension enable --py --sys-prefix ipyvue_comm
 
 When working with JupyterLab:
 
-    jupyter labextension develop --overwrite ipyvue_time_series
+    jupyter labextension develop --overwrite ipyvue_comm
 
 To rebuild the JavaScript code after making changes to anything in the `js/`
 directory:

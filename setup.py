@@ -18,7 +18,7 @@ log.set_verbosity(log.DEBUG)
 log.info('setup.py entered')
 log.info('$PATH=%s' % os.environ['PATH'])
 
-name = 'ipyvue_time_series'
+name = 'ipyvue_comm'
 LONG_DESCRIPTION = 'Real-Time Plots in Jupyter Notebooks and JupyterLab'
 
 js_dir = pjoin(here, 'js')
@@ -29,10 +29,10 @@ jstargets = [
 ]
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/ipyvue-time-series', 'ipyvue_time_series/nbextension', '*.*'),
-    ('share/jupyter/labextensions/ipyvue-time-series', 'ipyvue_time_series/labextension', "**"),
-    ("share/jupyter/labextensions/ipyvue-time-series", '.', "install.json"),
-    ('etc/jupyter/nbconfig/notebook.d', '.', 'ipyvue-time-series.json'),
+    ('share/jupyter/nbextensions/ipyvue-comm', 'ipyvue_comm/nbextension', '*.*'),
+    ('share/jupyter/labextensions/ipyvue-comm', 'ipyvue_comm/labextension', "**"),
+    ("share/jupyter/labextensions/ipyvue-comm", '.', "install.json"),
+    ('etc/jupyter/nbconfig/notebook.d', '.', 'ipyvue-comm.json'),
 ]
 
 cmdclass = create_cmdclass('jsdeps', data_files_spec=data_files_spec)
@@ -42,19 +42,16 @@ cmdclass['jsdeps'] = combine_commands(
 
 setup_args = dict(
     name=name,
-    version="1.0.1",
-    description='Real-Time Plots in Jupyter Notebooks and JupyterLab',
+    version="0.0.0",
+    description='Asynchronous communication channels between Vue components in Jupyter and Python',
     long_description=LONG_DESCRIPTION,
     include_package_data=True,
-    install_requires=[
-        'ipyvue-remote-component>=1.1.0',
-    ],
     packages=find_packages(),
     zip_safe=False,
     cmdclass=cmdclass,
     author='Julian Rüth',
     author_email='julian.rueth@fsfe.org',
-    url='https://github.com/saraedum/ipyvue-time-series',
+    url='https://github.com/saraedum/ipyvue-comm',
     keywords=[
         'ipython',
         'jupyter',

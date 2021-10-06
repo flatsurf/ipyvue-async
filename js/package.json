@@ -1,13 +1,13 @@
 {
-  "name": "ipyvue-time-series",
-  "version": "1.0.1",
+  "name": "ipyvue-comm",
+  "version": "0.0.0",
   "description": "Real-Time Plots in Jupyter Notebooks and JupyterLab",
   "author": "Julian Rüth",
   "main": "lib/index.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/saraedum/ipyvue-time-series.git"
+    "url": "https://github.com/saraedum/ipyvue-comm.git"
   },
   "keywords": [
     "jupyter",
@@ -21,7 +21,7 @@
     "dist/*.js"
   ],
   "scripts": {
-    "clean": "rimraf dist/ && rimraf ../ipyvue_time_series/labextension/ && rimraf ../ipyvue_time_series/nbextension",
+    "clean": "rimraf dist/ && rimraf ../ipyvue_comm/labextension/ && rimraf ../ipyvue_comm/nbextension",
     "prepublish": "yarn run clean && yarn run build:prod",
     "build": "webpack --mode=development && yarn run build:labextension:dev",
     "build:prod": "webpack --mode=production && yarn run build:labextension",
@@ -40,7 +40,7 @@
   },
   "jupyterlab": {
     "extension": "lib/labplugin",
-    "outputDir": "../ipyvue_time_series/labextension",
+    "outputDir": "../ipyvue_comm/labextension",
     "sharedPackages": {
       "@jupyter-widgets/base": {
         "bundled": false,
