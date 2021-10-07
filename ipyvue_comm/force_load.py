@@ -3,8 +3,8 @@ from ipywidgets import DOMWidget
 
 class ForceLoad(DOMWidget):
     r"""
-    TimeSeries includes this widget to force the `activate()` function in
-    the JavaScript part of ipyvue-comm to run.
+    ipyvue-comm includes this widget to force the `activate()` function in the
+    JavaScript part of ipyvue-comm to run.
 
     We need this to make sure that the `<comm/>` component gets
     registered with Vue.js before any Vue code gets rendered by ipyvue.

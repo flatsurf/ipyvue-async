@@ -1,4 +1,4 @@
-from .time_series import TimeSeries
+from .comm_widget import CommWidget
 
 
 version_info = (0, 0, 0)

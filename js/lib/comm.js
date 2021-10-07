@@ -56,7 +56,11 @@ function createComm(widget_manager, target) {
 export default {
   // This object is provided by ipyvue's VueView
   inject: [ 'viewCtx' ],
-  render() {},
+  template: `
+    <div>
+      <slot />
+    </div>
+  `,
   async mounted() {
     const view = this.viewCtx.getView();
     const model = view.model;
@@ -77,11 +81,38 @@ export default {
       comm: null,
     };
   },
+  props: ['refs'],
   methods: {
     onMessage(message) {
       const payload = message.content.data;
-      this.$emit(payload.command, payload);
-      this.comm.send({command: "ack"});
+      const action = payload.action;
+      if (action === "call") {
+        const {target, endpoint, args} = payload.data;
+        this.call(target, endpoint, args)
+      } else if (action === "query") {
+        const {identifier, data} = payload.data;
+        const {target, endpoint, args} = data;
+        this.query(identifier, target, endpoint, args);
+      } else {
+        throw new Error(`Unsupported action ${action}`);
+      }
+    },
+
+    call(target, endpoint, args) {
+      const ref = this.refs[target];
+      ref[endpoint](...args);
+    },
+    async query(identifier, target, endpoint, args) {
+      const ref = this.refs[target];
+      // TODO: Exception handling.
+      // TODO: Await if promise.
+      let value = ref[endpoint]
+      if (typeof value === "function")
+        value = value(...args)
+      // TODO: else if (args) complain.
+      if (typeof value.then === "function")
+        value = await value;
+      this.comm.send({command: "callback", data: { value, identifier }});
     },
   }
 }
