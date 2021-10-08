@@ -81,9 +81,15 @@ class Channel:
         query = Query()
         self._queries[query._identifier] = query
 
-        await self.message("query", {
-            "identifier": query._identifier,
-            "data": data
-        })
+        try:
+            await self.message("query", {
+                "identifier": query._identifier,
+                "data": data
+            })
 
-        return await query._future
+            return await query._future
+        except asyncio.CancelledError:
+            await self.message("cancel", {
+                "identifier": query._identifier,
+            });
+            raise

@@ -79,6 +79,7 @@ export default {
   data() {
     return {
       comm: null,
+      tokens: {},
     };
   },
   props: ['refs'],
@@ -89,6 +90,9 @@ export default {
       if (action === "call") {
         const {target, endpoint, args} = payload.data;
         this.call(target, endpoint, args)
+      } else if (action === "cancel") {
+        const { identifier } = payload.data;
+        this.cancel(identifier);
       } else if (action === "query") {
         const {identifier, data} = payload.data;
         const {target, endpoint, args} = data;
@@ -111,9 +115,22 @@ export default {
       if (typeof value === "function")
         value = value(...args)
       // TODO: else if (args) complain.
-      if (typeof value.then === "function")
+      if (typeof value.then === "function") {
+        if (value.cancel != null)
+          // TODO: Cleanup
+          this.tokens[identifier] = () => value.cancel();
         value = await value;
+      }
       this.comm.send({command: "callback", data: { value, identifier }});
     },
+
+    cancel(identifier) {
+      const token = this.tokens[identifier];
+      if (token === undefined) {
+        console.log(`Cannot cancel request ${identifier}. No cancellation defined for this request.`)
+        return;
+      }
+      token();
+    }
   }
 }
