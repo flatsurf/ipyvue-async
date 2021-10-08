@@ -44,9 +44,7 @@ function createComm(widget_manager, target) {
     const sessionContext = context.sessionContext;
     const kernel = sessionContext.session.kernel;
 
-    const comm = kernel.createComm(target);
-    comm.open();
-    return comm;
+    return kernel.createComm(target);
   } else {
     // Classic Notebook
     return widget_manager.comm_manager.new_comm(target, {});
@@ -71,7 +69,9 @@ export default {
     const commTarget = registerCommTarget(model.widget_manager, target, (msg) => this.onMessage(msg));
 
     // We tell the backend about our comm target.
-    createComm(model.widget_manager, model.attributes.target).send({command: "register", target});
+    const toCommWidget = createComm(model.widget_manager, model.attributes.target);
+    toCommWidget.open();
+    toCommWidget.send({command: "register", target});
 
     // Wait for the backend to connect to our comm target.
     this.comm = await commTarget;
@@ -102,6 +102,7 @@ export default {
       const ref = this.refs[target];
       ref[endpoint](...args);
     },
+
     async query(identifier, target, endpoint, args) {
       const ref = this.refs[target];
       // TODO: Exception handling.

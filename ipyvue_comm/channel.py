@@ -1,21 +1,31 @@
-class Client:
+import asyncio
+
+class Channel:
     r"""
-    A channel from the server to single frontend client widget.
+    A channel from the server to a single frontend widget.
     """
-    def __init__(self, comm, log):
-        self._comm = comm
+    def __init__(self, log):
+        self._comm = asyncio.get_running_loop().create_future()
         self._log = log
         self._queries = {}
-
-        @comm.on_msg
-        def _recv(msg):
-            self._receive(msg)
 
         self._commands = {
             "callback": self._callback,
         }
 
-    def message(self, action, data):
+    def is_connected(self):
+        return self._comm.done()
+
+    def connect(self, comm):
+        if self.is_connected():
+            raise Exception("Cannot reconnect already connected channel.")
+        self._comm.set_result(comm)
+
+        @comm.on_msg
+        def _recv(msg):
+            self._receive(msg)
+
+    async def message(self, action, data):
         r"""
         Send ``data`` to the frontend.
 
@@ -27,15 +37,17 @@ class Client:
             "data": data
         }
 
-        self._log.debug(f"Sending message to client: {message}")
+        self._log.warning(f"Sending message to client: {message}")
 
-        self._comm.send(message)
+        (await self._comm).send(message)
+
+        self._log.warn("Message sent.")
 
     def _receive(self, message):
         r"""
         Handla an incomming ``message``.
         """
-        self._log.debug(f"Client received message: {message}")
+        self._log.debug(f"Backend received message: {message}")
         try:
             data = message.get("content", {}).get("data", {})
             command = data.get("command", None)
@@ -57,7 +69,7 @@ class Client:
         self._queries[identifier]._future.set_result(value)
         del self._queries[identifier]
 
-    def query(self, data):
+    async def query(self, data):
         class Query:
             def __init__(self):
                 import uuid
@@ -66,36 +78,12 @@ class Client:
                 import asyncio
                 self._future = asyncio.get_running_loop().create_future()
 
-            def done(self):
-                return self._future.done()
-
-            @property
-            async def value(self):
-                import asyncio
-
-                delay = .001
-                events = 1
-                import jupyter_ui_poll
-                async with jupyter_ui_poll.ui_events() as poll:
-                    while not self.done():
-                        await poll(events)
-
-                        events = min(events + 1, 64)
-
-                        await asyncio.sleep(delay)
-
-                        # Wait for at most 250ms, the reaction time of most
-                        # people, https://stackoverflow.com/a/44755058/812379.
-                        delay = min(2*delay, .25)
-
-                return self._future.result()
-
         query = Query()
         self._queries[query._identifier] = query
 
-        self.message("query", {
+        await self.message("query", {
             "identifier": query._identifier,
             "data": data
         })
 
-        return query
+        return await query._future

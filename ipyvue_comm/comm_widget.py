@@ -1,12 +1,14 @@
+import asyncio
+
 from ipywidgets.widgets.widget import widget_serialization
 from ipywidgets import DOMWidget
 from traitlets import Unicode, Any
 
-from .force_load import force_load
+from ipyvue_comm.force_load import force_load
 
 class CommWidget(DOMWidget):
     r"""
-    A widget that has a direct Comm channel to its clients.
+    A widget that has a direct Comm channel to each of its representations in the frontend.
 
     Normally, widgets use the traitlet mechanism to talk between the
     JavaScript frontend and the Python backend. While this is great for many
@@ -27,11 +29,7 @@ class CommWidget(DOMWidget):
         self.target = f"{self.model_id}-comm-widget"
 
         # The currently registered clients, i.e., widget outputs in the frontend.
-        self._clients = set()
-
-        # The number of widget outputs in the frontend that we have created but
-        # that have not connected to the backend.
-        self._pending = 0
+        self._channels = set()
 
         # A map of command names to callbacks.
         self._commands = {
@@ -41,31 +39,64 @@ class CommWidget(DOMWidget):
         # Start accepting connections from the frontend.
         self._register_comm_target()
 
-    def call(self, target, endpoint, *args):
-        for client in self._clients:
-            client.message("call", {
+        self._display_callbacks.register_callback(self._create_channel)
+
+    def _create_channel(self, *args, **kwargs):
+        from ipyvue_comm.channel import Channel
+        self._channels.add(Channel(self.log))
+
+    async def call(self, target, endpoint, *args):
+        for channel in self._channels:
+            await channel.message("call", {
                 "target": target,
                 "endpoint": endpoint,
                 "args": args,
             })
 
-    def query(self, target, endpoint, *args):
-        class Query:
-            def __init__(self, queries):
-                self._queries = queries
+    async def poll(self, coroutine):
+        future = asyncio.ensure_future(coroutine)
 
-            @property
-            async def values(self):
-                import asyncio
-                return [await query.value for query in self._queries]
+        events = 1
+        delay = .001
 
-            def done(self):
-                return all([query.done() for query in self._queries])
+        import jupyter_ui_poll
+        async with jupyter_ui_poll.ui_events() as poll:
+            while not future.done():
+                await poll(events)
 
-        return Query([client.query({
+                events = min(events + 1, 64)
+
+                await asyncio.sleep(delay)
+
+                # Wait for at most 250ms, the reaction time of most
+                # people, https://stackoverflow.com/a/44755058/812379.
+                delay = min(2*delay, .25)
+
+        return await future
+
+    async def query(self, target, endpoint, *args, return_when=asyncio.ALL_COMPLETED):
+        queries = [channel.query({
             "target": target,
             "endpoint": endpoint,
-            "args": args}) for client in self._clients])
+            "args": args}) for channel in self._channels]
+
+        if not queries:
+            raise ValueError("Cannot query when there is nothing displayed in the frontend yet.")
+
+        results = [asyncio.get_running_loop().create_task(query) for query in queries]
+
+        done, pending = await asyncio.wait(results, return_when=return_when)
+
+        for awaitable in pending:
+            awaitable.cancel()
+
+        results = [result.result() for result in done]
+
+        if return_when == asyncio.FIRST_COMPLETED:
+            assert len(results) >= 1
+            return results[0]
+        else:
+            return results
 
     def _receive(self, message):
         r"""
@@ -94,18 +125,22 @@ class CommWidget(DOMWidget):
         a big issue since all connections are essentially blocking and so
         inactive clients do not consume bandwidth to the frontend.
         """
+        self.log.warning(f"Registering client for {data['target']}")
         from ipykernel.comm import Comm
         comm = Comm(data["target"], {})
-        self._clients.add(self._create_client(comm))
-        self._pending -= 1
-        assert self._pending >= 0
+        for channel in self._channels:
+            if not channel.is_connected():
+                channel.connect(comm)
+                break
+        else:
+            raise Exception("TODO: No channel for this comm.")
 
-    def _create_client(self, comm):
+    def _open_channel(self, comm):
         r"""
         Return the ``comm`` wrapped as a client object.
         """
-        from .client import Client
-        return Client(comm, self.log)
+        from .channel import Channel
+        return Channel(comm, self.log)
 
     def _register_comm_target(self):
         r"""
@@ -122,4 +157,5 @@ class CommWidget(DOMWidget):
                 """
                 self._receive(msg)
 
+        self.log.warning(f"Inviting clients to connect ot {self.target}")
         self.comm.kernel.comm_manager.register_target(self.target, configure_comm)
