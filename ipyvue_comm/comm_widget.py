@@ -125,23 +125,26 @@ class CommWidget(DOMWidget):
         a big issue since all connections are essentially blocking and so
         inactive clients do not consume bandwidth to the frontend.
         """
-        self.log.warning(f"Registering client for {data['target']}")
+        target = data["target"]
+
+        self.log.debug(f"Registering client for {target}")
+
         from ipykernel.comm import Comm
-        comm = Comm(data["target"], {})
+        comm = Comm(target, {})
+
         for channel in self._channels:
             if not channel.is_connected():
                 channel.connect(comm)
-                break
-        else:
-            raise Exception("TODO: No channel for this comm.")
+                return
 
-    def _open_channel(self, comm):
-        r"""
-        Return the ``comm`` wrapped as a client object.
-        """
-        from .channel import Channel
-        return Channel(comm, self.log)
-
+        # This happens when a notebook is loaded with cells already
+        # executed, e.g., when refreshing in the browser or opening the
+        # same notebook twice.
+        # There is no hope to reconnect this frontend to an existing
+        # (orphaned) channel so we create a new one.
+        self._create_channel()
+        return self._register_client(data)
+        
     def _register_comm_target(self):
         r"""
         Register a name that the frontend can connect to with a Comm.
@@ -157,5 +160,4 @@ class CommWidget(DOMWidget):
                 """
                 self._receive(msg)
 
-        self.log.warning(f"Inviting clients to connect ot {self.target}")
         self.comm.kernel.comm_manager.register_target(self.target, configure_comm)
