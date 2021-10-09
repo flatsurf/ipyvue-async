@@ -80,7 +80,7 @@ export default {
   async mounted() {
     const view = this.viewCtx.getView();
     const model = view.model;
-    const target = `${model.attributes.target}-${view.cid}`;
+    const target = `${model.attributes.target}-${[...Array(8)].map(() => Math.random().toString(36)[2]).join('')}`;
     await commReady(model.widget_manager);
 
     // Create a comm target that the backend can send data to.
