@@ -24,12 +24,12 @@ const plugin = require('./plugin');
 const base = require('@jupyter-widgets/base');
 
 module.exports = {
-  id: 'ipyvue-comm:plugin',
+  id: 'ipyvue-async:plugin',
   requires: [base.IJupyterWidgetRegistry],
   activate: function(app, widgets) {
       plugin.activate(app, widgets);
       widgets.registerWidget({
-          name: 'ipyvue-comm',
+          name: 'ipyvue-async',
           version: plugin.version,
           exports: plugin
       });

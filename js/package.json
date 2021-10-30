@@ -1,5 +1,5 @@
 {
-  "name": "ipyvue-comm",
+  "name": "ipyvue-async",
   "version": "0.0.0",
   "description": "Real-Time Plots in Jupyter Notebooks and JupyterLab",
   "author": "Julian Rüth",
@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/saraedum/ipyvue-comm.git"
+    "url": "https://github.com/flatsurf/ipyvue-async.git"
   },
   "keywords": [
     "jupyter",
@@ -21,7 +21,7 @@
     "dist/*.js"
   ],
   "scripts": {
-    "clean": "rimraf dist/ && rimraf ../ipyvue_comm/labextension/ && rimraf ../ipyvue_comm/nbextension",
+    "clean": "rimraf dist/ && rimraf ../ipyvue_async/labextension/ && rimraf ../ipyvue_comm/nbextension",
     "prepublish": "yarn run clean && yarn run build:prod",
     "build": "webpack --mode=development && yarn run build:labextension:dev",
     "build:prod": "webpack --mode=production && yarn run build:labextension",
@@ -40,7 +40,7 @@
   },
   "jupyterlab": {
     "extension": "lib/labplugin",
-    "outputDir": "../ipyvue_comm/labextension",
+    "outputDir": "../ipyvue_async/labextension",
     "sharedPackages": {
       "@jupyter-widgets/base": {
         "bundled": false,

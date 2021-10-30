@@ -6,8 +6,8 @@ build/
 node_modules/
 
 # Compiled javascript
-ipyvue_comm/nbextension/
-ipyvue_comm/labextension/
+ipyvue_async/nbextension/
+ipyvue_async/labextension/
 
 # OS X
 .DS_Store

@@ -1,11 +1,11 @@
-graft ipyvue_comm/nbextension
-graft ipyvue_comm/labextension
+graft ipyvue_async/nbextension
+graft ipyvue_async/labextension
 
 graft js
 graft tests
 prune **/node_modules
 
-include ipyvue-comm.json
+include ipyvue-async.json
 
 include LICENSE
 include setup.py

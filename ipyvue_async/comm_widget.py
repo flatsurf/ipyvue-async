@@ -26,7 +26,7 @@ from ipywidgets.widgets.widget import widget_serialization
 from ipywidgets import DOMWidget
 from traitlets import Unicode, Any
 
-from ipyvue_comm.force_load import force_load
+from ipyvue_async.force_load import force_load
 
 class CommWidget(DOMWidget):
     r"""
@@ -64,7 +64,7 @@ class CommWidget(DOMWidget):
         self._display_callbacks.register_callback(self._create_channel)
 
     def _create_channel(self, *args, **kwargs):
-        from ipyvue_comm.channel import Channel
+        from ipyvue_async.channel import Channel
         self._channels.add(Channel(self.log))
 
     async def call(self, target, endpoint, *args):

@@ -33,11 +33,11 @@ def _jupyter_labextension_paths():
     """
     # The command `jupyter labextension build` creates a package in
     # labextension/, see jupyterlab.outputDir in js/package.json
-    # These files are copied to extensions/ipyvue-comm/ in
+    # These files are copied to extensions/ipyvue-async/ in
     # JupyterLab when this package is pip-installed.
     return [{
         'src': 'labextension',
-        'dest': 'ipyvue-comm',
+        'dest': 'ipyvue-async',
     }]
 
 
@@ -46,12 +46,12 @@ def _jupyter_nbextension_paths():
     Called by Jupyter Notebook to find out which JavaScript assets need to be copied.
     """
     # The command `yarn build:prod` creates JavaScript assets in nbextension/.
-    # These files need to be copied to the nbextensions/ipyvue-comm/
+    # These files need to be copied to the nbextensions/ipyvue-async/
     # directory in Jupyter Notebook. The entrypoint in these files is
     # extension.js.
     return [{
         'section': 'notebook',
         'src': 'nbextension',
-        'dest': 'ipyvue-comm',
-        'require': 'ipyvue-comm/extension'
+        'dest': 'ipyvue-async',
+        'require': 'ipyvue-async/extension'
     }]

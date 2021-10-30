@@ -31,7 +31,7 @@ export class ForceLoadModel extends DOMWidgetModel {
         return {
             ...super.defaults(),
             _model_name: 'ForceLoadModel',
-            _model_module: 'ipyvue-comm',
+            _model_module: 'ipyvue-async',
             _model_module_version: '1.0.0',
         };
     }

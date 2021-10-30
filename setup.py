@@ -36,12 +36,8 @@ from jupyter_packaging import (
 
 here = os.path.dirname(os.path.abspath(__file__))
 
-log.set_verbosity(log.DEBUG)
-log.info('setup.py entered')
-log.info('$PATH=%s' % os.environ['PATH'])
-
-name = 'ipyvue_comm'
-LONG_DESCRIPTION = 'Real-Time Plots in Jupyter Notebooks and JupyterLab'
+name = 'ipyvue-async'
+LONG_DESCRIPTION = 'Asynchronous communication channels between Vue components in Jupyter and Python'
 
 js_dir = pjoin(here, 'js')
 
@@ -51,10 +47,10 @@ jstargets = [
 ]
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/ipyvue-comm', 'ipyvue_comm/nbextension', '*.*'),
-    ('share/jupyter/labextensions/ipyvue-comm', 'ipyvue_comm/labextension', "**"),
-    ("share/jupyter/labextensions/ipyvue-comm", '.', "install.json"),
-    ('etc/jupyter/nbconfig/notebook.d', '.', 'ipyvue-comm.json'),
+    ('share/jupyter/nbextensions/ipyvue-async', 'ipyvue_async/nbextension', '*.*'),
+    ('share/jupyter/labextensions/ipyvue-async', 'ipyvue_async/labextension', "**"),
+    ("share/jupyter/labextensions/ipyvue-async", '.', "install.json"),
+    ('etc/jupyter/nbconfig/notebook.d', '.', 'ipyvue-async.json'),
 ]
 
 cmdclass = create_cmdclass('jsdeps', data_files_spec=data_files_spec)
@@ -73,7 +69,7 @@ setup_args = dict(
     cmdclass=cmdclass,
     author='Julian Rüth',
     author_email='julian.rueth@fsfe.org',
-    url='https://github.com/saraedum/ipyvue-comm',
+    url='https://github.com/flatsurf/ipyvue-async',
     keywords=[
         'ipython',
         'jupyter',
@@ -84,8 +80,6 @@ setup_args = dict(
         'Framework :: IPython',
         "License :: OSI Approved :: MIT License",
         'Intended Audience :: Developers',
-        'Intended Audience :: Science/Research',
-        'Topic :: Multimedia :: Graphics',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
