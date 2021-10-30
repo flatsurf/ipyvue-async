@@ -82,13 +82,18 @@ class Channel:
             self._log.error(e)
 
     def _callback(self, data):
-        value = data["value"]
         identifier = data["identifier"]
 
         if identifier not in self._queries:
             raise ValueError(f"No pending callback for {identifier}")
 
-        self._queries[identifier]._future.set_result(value)
+        if "value" in data:
+            value = data["value"]
+            self._queries[identifier]._future.set_result(value)
+        elif "error" in data:
+            error = data["error"]
+            self._queries[identifier]._future.set_exception(Exception(error))
+
         del self._queries[identifier]
 
     async def query(self, data):

@@ -143,7 +143,7 @@ export default {
         } else if (action === "query") {
           const {identifier, data} = payload.data;
           const {target, endpoint, args} = data;
-          this.query(identifier, target, endpoint, args);
+          void this.query(identifier, target, endpoint, args);
         } else {
           throw new Error(`Unsupported action ${action}.`);
         }
@@ -165,32 +165,46 @@ export default {
     },
 
     call(target, endpoint, args) {
-      console.log(this.refs[target]);
-      const result = this.endpoint(target, endpoint)(...args);
-      if (isPromise(result))
-        result.then(() => {}, (e) => this.errors.push(e.message));
+      const value = this.endpoint(target, endpoint)(...args);
+      if (isPromise(value)) {
+        value.then(() => {}, (e) => {
+          this.errors.push(e.message);
+          throw e;
+        });
+      }
     },
 
     async query(identifier, target, endpoint, args) {
-      // TODO: Exception handling.
-      // TODO: Await if promise.
-      let value = this.endpoint(target, endpoint);
-      if (typeof value === "function")
-        value = value(...args)
-      // TODO: else if (args) complain.
-      if (typeof value.then === "function") {
-        if (value.cancel != null)
-          // TODO: Cleanup
-          this.tokens[identifier] = () => value.cancel();
-        value = await value;
+      try {
+        let value = null;
+        try {
+          value = this.endpoint(target, endpoint);
+          if (typeof value === "function")
+            value = value(...args)
+          else if (args.length)
+            throw Error(`Cannot call ${target}.${endpoint} with arguments since it is not a function.`);
+          if (isPromise(value)) {
+            if (value.cancel != null)
+              this.tokens[identifier] = () => value.cancel();
+            else
+              this.tokens[identifier] = () => {};
+            value = await value;
+          }
+        } catch (e) {
+          this.comm.send({command: "callback", data: { error: e.message, identifier }});
+          return;
+        }
+        this.comm.send({command: "callback", data: { value, identifier }});
+      } finally {
+        if (this.tokens[identifier])
+          delete this.tokens[identifier];
       }
-      this.comm.send({command: "callback", data: { value, identifier }});
     },
 
     cancel(identifier) {
       const token = this.tokens[identifier];
       if (token === undefined) {
-        console.log(`Cannot cancel request ${identifier}. No cancellation defined for this request.`)
+        this.errors.push(`Cannot cancel request ${identifier}. No cancellation for this request available anymore.`);
         return;
       }
       token();
