@@ -1,3 +1,25 @@
+/* ******************************************************************************
+ * Copyright (c) 2021 Julian Rüth <julian.rueth@fsfe.org>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * *****************************************************************************/
+
 // Resolve when the notebook is ready to create comm targets & open comms.
 async function commReady(widget_manager) {
   if (widget_manager.context) {
@@ -49,6 +71,11 @@ function createComm(widget_manager, target) {
     // Classic Notebook
     return widget_manager.comm_manager.new_comm(target, {});
   }
+}
+
+// Return whether object is a promise.
+function isPromise(object) {
+  return typeof(object) === "object" && typeof(object.then) === "function";
 }
 
 export default {
@@ -133,11 +160,15 @@ export default {
       const endpoint = ref[method];
       if (endpoint == null)
         throw new Error(`No function ${method} found in component ${target}.`)
-      return endpoint;
+      const bound = endpoint.bind ? endpoint.bind(ref) : endpoint;
+      return bound;
     },
 
     call(target, endpoint, args) {
-      this.endpoint(target, endpoint)(...args);
+      console.log(this.refs[target]);
+      const result = this.endpoint(target, endpoint)(...args);
+      if (isPromise(result))
+        result.then(() => {}, (e) => this.errors.push(e.message));
     },
 
     async query(identifier, target, endpoint, args) {
