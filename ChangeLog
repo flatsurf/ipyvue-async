@@ -4,6 +4,16 @@ ipyvue-async Change Log
 
 .. current developments
 
+v0.1.1
+====================
+
+**Fixed:**
+
+* Disable Jupyter functionality when doctesting. Otherwise, we cannot use this
+  package at all in doctests of downstream packages.
+
+
+
 v0.1.0
 ====================
 
