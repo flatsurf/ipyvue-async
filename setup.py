@@ -60,7 +60,7 @@ cmdclass['jsdeps'] = combine_commands(
 
 setup_args = dict(
     name=name,
-    version="0.1.0",
+    version="0.1.1",
     description='Asynchronous communication channels between Vue components in Jupyter and Python',
     long_description=LONG_DESCRIPTION,
     include_package_data=True,
