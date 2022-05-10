@@ -34,9 +34,4 @@ directory:
     cd js
     yarn run build
 
-When working with JupyterLab you also need to reinstall the Python package:
-
-    cd ..
-    pip install -e . --no-deps
-
 You then need to refresh the Notebook/JupyterLab page for the changes to take effect.

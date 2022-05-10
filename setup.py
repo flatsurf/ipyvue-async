@@ -1,5 +1,5 @@
-#*******************************************************************************
-# Copyright (c) 2021 Julian Rüth <julian.rueth@fsfe.org>
+# ******************************************************************************
+# Copyright (c) 2021-2022 Julian Rüth <julian.rueth@fsfe.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,13 +18,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#*******************************************************************************
+# ******************************************************************************
 
 from __future__ import print_function
 from setuptools import setup, find_packages
 import os
 from os.path import join as pjoin
-from distutils import log
 
 from jupyter_packaging import (
     create_cmdclass,
@@ -64,6 +63,10 @@ setup_args = dict(
     description='Asynchronous communication channels between Vue components in Jupyter and Python',
     long_description=LONG_DESCRIPTION,
     include_package_data=True,
+    install_requires=[
+        'jupyter-ui-poll>=0.2.1,<0.3',
+        'ipyvue>=1.5.0',
+    ],
     packages=find_packages(),
     zip_safe=False,
     cmdclass=cmdclass,
