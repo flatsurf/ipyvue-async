@@ -1,3 +1,9 @@
+ipyvue-async does not work with recent versions of Jupyter anymore.
+
+All the features of ipyvue-async are available in [ipyµvue](https://github.com/flatsurf/ipymuvue) which we recommend to use instead.
+
+---
+
 ipyvue-async
 ===========
 
